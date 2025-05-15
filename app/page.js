@@ -1,95 +1,135 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client"
+import { useState, useEffect } from "react";
+import st from "./page.module.css";
 
 export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [totalCount, setTotalCount] = useState('');
+  const [name, setName] = useState('');
+  const [weightDone, setWseightDone] = useState(0);
+  const [boxes, setBoxes] = useState(0);
+  const [entries, setEntries] = useState([]);
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+  const [doneWeight, setDoneWeight] = useState(0);
+
+
+  useEffect(() => {
+    const fetchTotal = async () => {
+      const res = await fetch("/api/get-total");
+      const data = await res.json();
+      setTotalCount(data.total);
+    };
+
+    const fetchEntries = async () => {
+      const res = await fetch("/api/get-entries");
+      const data = await res.json();
+      setEntries(data);
+    };
+    fetchTotal();
+    fetchEntries();
+  }, []);
+
+  useEffect(() => {
+    const total = entries.reduce((acc, entry) => acc + entry.weight, 0);
+    setDoneWeight(Number(total.toFixed(1)));
+  }, [entries]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await fetch("/api/save-entries", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, weight: +weightDone, boxes: +boxes }),
+    });
+
+
+
+    
+    // setName("");
+    // setWseightDone(0);
+    // setBoxes(0);
+    const res = await fetch("/api/get-entries");
+    const data = await res.json();
+    setEntries(data);
+  };
+
+  const handleDelete = async (name) => {
+    const confirmed = confirm(`Удалить сотрудника ${name}?`);
+    if (!confirmed) return;
+
+    const res = await fetch("/api/delete-entry", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+
+    const result = await res.json();
+    console.log("Удалено:", result);
+
+    // Обновим список
+    const updated = await fetch("/api/get-entries");
+    const data = await updated.json();
+    setEntries(data);
+  };
+
+
+  return (
+    <div className={st.wrapper}>
+      <header className={st.header}>
+        <div className={st.nowDays}>Сегодня</div>
+        <div className={st.totalWeight}>
+          <span
+              onClick={async () => {
+                const totalValue = +prompt("Введите общий вес");
+                // отправка в MongoDB
+                await fetch("/api/save-total", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ total: totalValue }),
+                });
+              }}
+            >
+              .o?
+          </span>
+          Общий вес
+          <span>{totalCount}кг</span>
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className={st.doneWeight}>
+          Сделано <span>{doneWeight} кг</span>
+        </div> 
+            
+      </header>
+      <ol className={st.personeList}>
+        {entries
+          .slice()
+          .sort((a, b) => b.weight - a.weight)
+          .map((entry) => (
+            <li key={entry.name}>
+              {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящиков.  
+              <button onClick={() => handleDelete(entry.name)}>Удалить</button>
+            </li>
+        ))}
+      </ol>
+      {
+        console.log(entries)
+      }
+
+      <form className={st.formPush}  onSubmit={handleSubmit}>
+        <input type="number" min={2} step="any" placeholder="Укажите вес" onChange={(e) => {setWseightDone(e.target.value) }}/>
+        <input type="number" min={1} placeholder="Кол. ящиков"  onChange={(e) => {setBoxes(e.target.value) }}/>
+        <select onChange={(e) => {
+
+          setName(e.target.value)}}>
+
+          <option value="">Введи имя сотрудника</option>
+          <option value="Андрюха">Андрюха</option>
+          <option value="Русик">Русик</option>
+          <option value="Стас">Стас</option>
+          <option value="Влад">Влад</option>
+          <option value="Щичек">Щичек</option>
+        </select>
+        <button type="submit">отправить</button>
+      </form>
+    </div>  
   );
 }
