@@ -126,6 +126,7 @@ export default function Home() {
           <option value="Русик">Русик</option>
           <option value="Стас">Стас</option>
           <option value="Влад">Влад</option>
+          <option value="Влад">Лёха</option>
           <option value="Щичек">Щичек</option>
         </select>
         <button type="submit">отправить</button>
