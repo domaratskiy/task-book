@@ -101,7 +101,6 @@ export default function Home() {
       </header>
       <ol className={st.personeList}>
         {entries
-          .slice()
           .sort((a, b) => b.weight - a.weight)
           .map((entry) => (
             <li key={entry.name}>
