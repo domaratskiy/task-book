@@ -2,9 +2,11 @@ import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
-const db = client.db("mydb");
+
 
 export async function POST(req) {
+  const db = client.db("mydb");
+
   const { total } = await req.json();
 
   await db.collection("totals").updateOne(

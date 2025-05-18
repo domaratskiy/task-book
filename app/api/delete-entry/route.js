@@ -3,10 +3,17 @@ import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
-const db = client.db("mydb");
+
 
 export async function DELETE(req) {
   try {
+    
+    if (!client.topology || !client.topology.isConnected?.()) {
+      await client.connect();
+    }
+
+
+    const db = client.db("mydb");
     const body = await req.json();
     const name = body?.name;
 

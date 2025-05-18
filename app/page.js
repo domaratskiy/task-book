@@ -110,9 +110,7 @@ export default function Home() {
             </li>
         ))}
       </ol>
-      {
-        console.log(entries)
-      }
+
 
       <form className={st.formPush}  onSubmit={handleSubmit}>
         <input type="number" min={2} step="any" placeholder="Укажите вес" onChange={(e) => {setWseightDone(e.target.value) }}/>
