@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import st from "./page.module.css";
 
 export default function Home() {
-  const [totalCount, setTotalCount] = useState('');
+  const [totalCount, setTotalCount] = useState(0);
   const [name, setName] = useState('');
   const [weightDone, setWseightDone] = useState(0);
   const [boxes, setBoxes] = useState(0);
@@ -41,12 +41,6 @@ export default function Home() {
       body: JSON.stringify({ name, weight: +weightDone, boxes: +boxes }),
     });
 
-
-
-    
-    // setName("");
-    // setWseightDone(0);
-    // setBoxes(0);
     const res = await fetch("/api/get-entries");
     const data = await res.json();
     setEntries(data);
@@ -101,7 +95,6 @@ export default function Home() {
       </header>
       <ol className={st.personeList}>
         {entries
-          .sort((a, b) => b.weight - a.weight)
           .map((entry) => (
             <li key={entry.name}>
               {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящиков.  
