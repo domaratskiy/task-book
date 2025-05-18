@@ -14,7 +14,7 @@ export default function Home() {
 
   useEffect(() => {
     const fetchTotal = async () => {
-      const res = await fetch("/api/get-total");
+      const res = await fetch("/api/total");
       const data = await res.json();
       setTotalCount(data.total);
     };
@@ -81,7 +81,7 @@ export default function Home() {
               onClick={async () => {
                 const totalValue = +prompt("Введите общий вес");
                 // отправка в MongoDB
-                await fetch("/api/save-total", {
+                await fetch("/api/total", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({ total: totalValue }),
