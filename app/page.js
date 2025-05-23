@@ -98,14 +98,20 @@ export default function Home() {
         </div>
       </header>
 
-      <ol className={st.personeList}>
-        {Array.isArray(entries) && entries.map((entry) => (
-          <li key={entry.name}>
-            {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящиков.
-            <button onClick={() => handleDelete(entry.name)}>Удалить</button>
-          </li>
-        ))}
-      </ol>
+<ol className={st.personeList}>
+  {Array.isArray(entries) &&
+    [...entries]
+      .sort((a, b) => b.weight - a.weight)
+      .map((entry) => (
+        <li key={entry.name} >
+          <div >
+          {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящиков.
+          <button onClick={() => handleDelete(entry.name)}>Удалить</button>
+          </div>
+         
+        </li>
+      ))}
+</ol>
 
       <form className={st.formPush} onSubmit={handleSubmit}>
         <input
