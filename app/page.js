@@ -73,7 +73,19 @@ export default function Home() {
   return (
     <div className={st.wrapper}>
       <header className={st.header}>
-        <div className={st.nowDays}>Сегодня</div>
+        <div className={st.nowDays}>
+          Сьогодні <div>
+  {new Date().toLocaleString("uk-UA", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit"
+  })}
+</div>
+        </div>
         <div className={st.totalWeight}>
           <span
             onClick={async () => {
@@ -98,20 +110,20 @@ export default function Home() {
         </div>
       </header>
 
-<ol className={st.personeList}>
-  {Array.isArray(entries) &&
-    [...entries]
-      .sort((a, b) => b.weight - a.weight)
-      .map((entry) => (
-        <li key={entry.name} >
-          <div >
-          {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящиков.
-          <button onClick={() => handleDelete(entry.name)}>Удалить</button>
-          </div>
-         
-        </li>
-      ))}
-</ol>
+      <ol className={st.personeList}>
+        {Array.isArray(entries) &&
+          [...entries]
+            .sort((a, b) => b.weight - a.weight)
+            .map((entry) => (
+              <li key={entry.name} >
+                <div >
+                {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящ.
+                <button onClick={() => handleDelete(entry.name)}>Удалить</button>
+                </div>
+              
+              </li>
+            ))}
+      </ol>
 
       <form className={st.formPush} onSubmit={handleSubmit}>
         <input
