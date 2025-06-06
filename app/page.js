@@ -98,11 +98,7 @@ export default function Home() {
 
       <ol className={st.personeList}>
       {[...entries]
-          .sort((a, b) => {
-            const totalA = Array.isArray(a.weights) ? a.weights.reduce((x, y) => x + y, 0) : 0;
-            const totalB = Array.isArray(b.weights) ? b.weights.reduce((x, y) => x + y, 0) : 0;
-            return totalB - totalA;
-          })
+
           .map((entry) => (
               <li key={entry.name}>
                 <div>
