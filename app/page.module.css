@@ -50,19 +50,21 @@
 .personeList  li div {
   display: flex;
   align-items:baseline;
- 
+ padding-bottom: 10px;
   
 }
 .listItem{
-  padding-left: 25px;
+  padding-left: 20px;
+
 }
 .listName {
-  width: 145px;
+  width: 120px;
 }
 .personeList  li button{
   margin-left: auto;
   position: relative;
-  padding: 12px 24px;
+  padding: 10px;
+  
   font-size: 12px;
   font-weight: bold;
   color: #000;
