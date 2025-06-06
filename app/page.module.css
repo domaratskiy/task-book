@@ -7,19 +7,24 @@
   flex-wrap: wrap;
 }
 .nowDays {
-  
+  margin-bottom: 20px;
 }
 .totalWeight > span{
   color: brown;
   font-size: 2rem;
+  padding:0 20px;
 }
 .doneWeight > span {
   color: green;
   font-size: 2rem;
+  padding:0 20px;
 }
-.doneWeight, .totalWeight {
+.doneWeight, .totalWeight
+ {
   align-self: flex-end;
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
 }
 .personeList {
   padding-left: 15px;
@@ -27,6 +32,7 @@
 }
 .personeList  li {
   margin-bottom: 10px;
+  border-bottom: 2px solid #4adede;
 }
 .formPush {
   margin-top: 30px;
@@ -43,10 +49,18 @@
 }
 .personeList  li div {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  align-items:baseline;
+  padding: 10px;
+  
+}
+.listItem{
+  padding-left: 25px;
+}
+.listName {
+  width: 145px;
 }
 .personeList  li button{
+  margin-left: auto;
   position: relative;
   padding: 12px 24px;
   font-size: 12px;

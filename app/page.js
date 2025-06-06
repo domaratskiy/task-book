@@ -8,42 +8,56 @@ export default function Home() {
   const [weightDone, setWeightDone] = useState(0);
   const [boxes, setBoxes] = useState(0);
   const [entries, setEntries] = useState([]);
-
   const [doneWeight, setDoneWeight] = useState(0);
+  const [nowString, setNowString] = useState('');
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = new Date().toLocaleString("uk-UA", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+      setNowString(now);
+    }, 1000); // каждую секунду обновление
+  
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const fetchTotal = async () => {
-      try {
-        const res = await fetch("/api/total");
-        const data = await res.json();
-        setTotalCount(data.total || 0);
-      } catch (error) {
-        console.error("Ошибка загрузки общего веса:", error);
-      }
+      const res = await fetch("/api/total");
+      const data = await res.json();
+      setTotalCount(data.total || 0);
     };
 
     const fetchEntries = async () => {
-      try {
-        const res = await fetch("/api/get-entries");
-        const data = await res.json();
-        setEntries(Array.isArray(data) ? data : []);
-      } catch (error) {
-        console.error("Ошибка загрузки записей:", error);
-        setEntries([]);
-      }
+      const res = await fetch("/api/get-entries");
+      const data = await res.json();
+      setEntries(Array.isArray(data) ? data : []);
     };
 
     fetchTotal();
     fetchEntries();
   }, []);
 
+
+
   useEffect(() => {
-    const total = entries.reduce((acc, entry) => acc + (entry.weight || 0), 0);
+    const total = entries.reduce((acc, entry) => {
+      const weights = Array.isArray(entry.weights) ? entry.weights : [];
+      return acc + weights.reduce((a, b) => a + b, 0);
+    }, 0);
     setDoneWeight(Number(total.toFixed(1)));
   }, [entries]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     await fetch("/api/save-entries", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -55,36 +69,11 @@ export default function Home() {
     setEntries(Array.isArray(data) ? data : []);
   };
 
-  const handleDelete = async (name) => {
-    const confirmed = confirm(`Удалить сотрудника ${name}?`);
-    if (!confirmed) return;
-
-    await fetch("/api/delete-entry", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name }),
-    });
-
-    const updated = await fetch("/api/get-entries");
-    const data = await updated.json();
-    setEntries(Array.isArray(data) ? data : []);
-  };
-
   return (
     <div className={st.wrapper}>
       <header className={st.header}>
         <div className={st.nowDays}>
-          Сьогодні <div>
-  {new Date().toLocaleString("uk-UA", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit"
-  })}
-</div>
+          {nowString}
         </div>
         <div className={st.totalWeight}>
           <span
@@ -95,36 +84,58 @@ export default function Home() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ total: totalValue }),
               });
-
               setTotalCount(totalValue);
             }}
           >
-            .o?
+            +
           </span>
-          Общий вес
-          <span>{totalCount} кг</span>
+          Общий вес <span>{totalCount} кг</span>
         </div>
-
         <div className={st.doneWeight}>
           Сделано <span>{doneWeight} кг</span>
         </div>
       </header>
 
       <ol className={st.personeList}>
-        {Array.isArray(entries) &&
-          [...entries]
-            .sort((a, b) => b.weight - a.weight)
-            .map((entry) => (
-              <li key={entry.name} >
-                <div >
-                {entry.name}: {Number(entry.weight.toFixed(1))} кг, {entry.boxes} ящ.
-                <button onClick={() => handleDelete(entry.name)}>Удалить</button>
-                </div>
-              
-              </li>
-            ))}
-      </ol>
+      {[...entries]
+          .sort((a, b) => {
+            const totalA = Array.isArray(a.weights) ? a.weights.reduce((x, y) => x + y, 0) : 0;
+            const totalB = Array.isArray(b.weights) ? b.weights.reduce((x, y) => x + y, 0) : 0;
+            return totalB - totalA;
+          })
+          .map((entry) => (
+              <li key={entry.name}>
+                <div>
+                  <div className={st.listName}>
+                  {entry.name}: {entry.weights.reduce((a, b) => a + b, 0)} кг
+                  </div>
+                  
+                  <ul className={st.listItem}>
+                    {entry.weights.map((w, index) => (
+                      <li key={index}>{w} кг</li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={async () => {
+                      await fetch("/api/delete-last", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ name: entry.name })
+                      });
 
+                      // Обновим список после удаления
+                      const res = await fetch("/api/get-entries");
+                      const data = await res.json();
+                      setEntries(Array.isArray(data) ? data : []);
+                    }}
+                  >
+                    X
+                  </button>
+                </div>
+              </li>
+
+              ))}
+      </ol>
       <form className={st.formPush} onSubmit={handleSubmit}>
         <input
           type="number"
@@ -146,7 +157,6 @@ export default function Home() {
           <option value="Стас">Стас</option>
           <option value="Влад">Влад</option>
           <option value="Лёха">Лёха</option>
-          
         </select>
         <button type="submit">отправить</button>
       </form>

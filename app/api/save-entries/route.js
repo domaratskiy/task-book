@@ -2,11 +2,15 @@ import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
-
+let isConnected = false;
 
 export async function POST(req) {
-  const db = client.db("mydb");
+  if (!isConnected) {
+    await client.connect();
+    isConnected = true;
+  }
 
+  const db = client.db("mydb");
   const { name, weight, boxes } = await req.json();
 
   if (!name) {
@@ -19,8 +23,14 @@ export async function POST(req) {
   await db.collection("entries").updateOne(
     { name },
     {
-      $inc: { weight: adjustedWeight, boxes },
-      $setOnInsert: { createdAt: new Date() }
+      $push: {
+        weights: adjustedWeight,
+        boxes: boxes
+      },
+      $setOnInsert: {
+        createdAt: new Date()
+        // ❌ НЕ добавляем weights: [], boxes: [] — иначе будет конфликт
+      }
     },
     { upsert: true }
   );
