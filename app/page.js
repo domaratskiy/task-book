@@ -102,9 +102,9 @@ export default function Home() {
           .map((entry) => (
               <li key={entry.name}>
                 <div>
-                  <div className={st.listName}>
-                  {entry.name}: {entry.weights.reduce((a, b) => a + b, 0)} кг
-                  </div>
+                <div className={st.listName}>
+  {entry.name}: {Math.round(entry.weights.reduce((a, b) => a + b, 0))} кг
+</div>
                   
                   <ul className={st.listItem}>
                     {entry.weights.map((w, index) => (
