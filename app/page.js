@@ -103,8 +103,8 @@ export default function Home() {
               <li key={entry.name}>
                 <div>
                 <div className={st.listName}>
-  {entry.name}: {Math.round(entry.weights.reduce((a, b) => a + b, 0))} кг
-</div>
+                  {entry.name}: {Math.round(entry.weights.reduce((a, b) => a + b, 0))} кг
+                </div>
                   
                   <ul className={st.listItem}>
                     {entry.weights.map((w, index) => (
@@ -112,21 +112,25 @@ export default function Home() {
                     ))}
                   </ul>
                   <button
-                    onClick={async () => {
-                      await fetch("/api/delete-last", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ name: entry.name })
-                      });
+  onClick={async () => {
+    const confirmed = confirm("Точно удалить последнюю запись?");
+    if (!confirmed) return; // Если нажал "Отмена" — выходим
 
-                      // Обновим список после удаления
-                      const res = await fetch("/api/get-entries");
-                      const data = await res.json();
-                      setEntries(Array.isArray(data) ? data : []);
-                    }}
-                  >
-                    X
-                  </button>
+    await fetch("/api/delete-last", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name: entry.name }),
+    });
+
+    // Обновим список после удаления
+    const res = await fetch("/api/get-entries");
+    const data = await res.json();
+    setEntries(Array.isArray(data) ? data : []);
+  }}
+>
+  X
+</button>
+
                 </div>
               </li>
 
