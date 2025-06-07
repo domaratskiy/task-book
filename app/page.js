@@ -11,6 +11,14 @@ export default function Home() {
   const [doneWeight, setDoneWeight] = useState(0);
   const [nowString, setNowString] = useState('');
 
+  const passwords = {
+    "Андрюха": "1234",
+    "Русик": "22",
+    "Стас": "passStas",
+    "Влад": "passVlad",
+    "Лёха": "passLeha",
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date().toLocaleString("uk-UA", {
@@ -114,18 +122,26 @@ export default function Home() {
                   <button
   onClick={async () => {
     const confirmed = confirm("Точно удалить последнюю запись?");
-    if (!confirmed) return; // Если нажал "Отмена" — выходим
+    if (!confirmed) return;
 
-    await fetch("/api/delete-last", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: entry.name }),
-    });
+    const password = prompt("Введите пароль");
+    if (!password) return;
 
-    // Обновим список после удаления
-    const res = await fetch("/api/get-entries");
-    const data = await res.json();
-    setEntries(Array.isArray(data) ? data : []);
+    // Проверка пароля из объекта passwords
+    if (password === passwords[entry.name]) {
+      await fetch("/api/delete-last", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: entry.name }),
+      });
+
+      // Обновим список после удаления
+      const res = await fetch("/api/get-entries");
+      const data = await res.json();
+      setEntries(Array.isArray(data) ? data : []);
+    } else {
+      alert("Неверный пароль!");
+    }
   }}
 >
   X
@@ -133,7 +149,6 @@ export default function Home() {
 
                 </div>
               </li>
-
               ))}
       </ol>
       <form className={st.formPush} onSubmit={handleSubmit}>
