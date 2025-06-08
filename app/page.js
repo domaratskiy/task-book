@@ -57,7 +57,7 @@ export default function Home() {
   useEffect(() => {
     const total = entries.reduce((acc, entry) => {
       const weights = Array.isArray(entry.weights) ? entry.weights : [];
-      return acc + weights.reduce((a, b) => a + b, 0);
+      return acc + weights.reduce((a, b) => a + b.value, 0); // <== здесь .value
     }, 0);
     setDoneWeight(Number(total.toFixed(1)));
   }, [entries]);
@@ -111,12 +111,12 @@ export default function Home() {
               <li key={entry.name}>
                 <div>
                 <div className={st.listName}>
-                  {entry.name}: {Math.round(entry.weights.reduce((a, b) => a + b, 0))} кг
+                {entry.name}: {Math.round(entry.weights.reduce((a, b) => a + b.value, 0))} кг
                 </div>
                   
                   <ul className={st.listItem}>
-                    {entry.weights.map((w, index) => (
-                      <li key={index}>{w} кг</li>
+                  {entry.weights.map((w, index) => (
+                      <li key={index}>{w.value}кг.<span className={st.ItemDate}>({w.date})</span></li>
                     ))}
                   </ul>
                   <button

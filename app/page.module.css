@@ -51,10 +51,14 @@
   display: flex;
   align-items:baseline;
  padding-bottom: 10px;
+ text-shadow: -5px 1px 19px #8b958c;
   
 }
+.ItemDate {
+  color: aqua;
+}
 .listItem{
-  padding-left: 20px;
+  padding-left: 10px;
 
 }
 .listName {
