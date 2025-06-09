@@ -1,5 +1,8 @@
 .wrapper {
+
   padding: 10px;
+  min-height: 100vh;
+  background-color: rgba(0, 0, 0, 0.6);
 }
 .header{
   display: flex;

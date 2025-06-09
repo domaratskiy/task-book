@@ -19,26 +19,26 @@ export async function POST(req) {
 
   const collection = db.collection("entries");
 
-  // Сначала получим текущую запись
   const user = await collection.findOne({ name });
 
   if (!user || !user.weights || user.weights.length === 0) {
     return Response.json({ success: false, message: "Нет данных для удаления" }, { status: 404 });
   }
 
-  // Удалим последний элемент вручную
+  // Удалить последний элемент
   user.weights.pop();
   user.boxes.pop();
 
-  const totalWeight = user.weights.reduce((a, b) => a + b, 0);
+  // Подсчитать итоговый вес
+  const totalWeight = user.weights.reduce((a, b) => a + b.value, 0);
 
   if (totalWeight === 0 || user.weights.length === 0) {
-    // Удалить сотрудника полностью
+    // Если ничего не осталось — удалить запись
     await collection.deleteOne({ name });
     return Response.json({ success: true, message: "Сотрудник удалён, вес = 0" });
   }
 
-  // Обновить массивы после удаления последнего элемента
+  // Иначе обновить записи
   await collection.updateOne(
     { name },
     {

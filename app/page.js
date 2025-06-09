@@ -120,32 +120,32 @@ export default function Home() {
                     ))}
                   </ul>
                   <button
-  onClick={async () => {
-    const confirmed = confirm("Точно удалить последнюю запись?");
-    if (!confirmed) return;
+                      onClick={async () => {
+                        const confirmed = confirm("Точно удалить последнюю запись?");
+                        if (!confirmed) return;
 
-    const password = prompt("Введите пароль");
-    if (!password) return;
+                        const password = prompt("Введите пароль");
+                        if (!password) return;
 
-    // Проверка пароля из объекта passwords
-    if (password === passwords[entry.name]) {
-      await fetch("/api/delete-last", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: entry.name }),
-      });
+                        // Проверка пароля из объекта passwords
+                        if (password === passwords[entry.name]) {
+                          await fetch("/api/delete-last", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ name: entry.name }),
+                          });
 
-      // Обновим список после удаления
-      const res = await fetch("/api/get-entries");
-      const data = await res.json();
-      setEntries(Array.isArray(data) ? data : []);
-    } else {
-      alert("Неверный пароль!");
-    }
-  }}
->
-  X
-</button>
+                          // Обновим список после удаления
+                          const res = await fetch("/api/get-entries");
+                          const data = await res.json();
+                          setEntries(Array.isArray(data) ? data : []);
+                        } else {
+                          alert("Неверный пароль!");
+                        }
+                      }}
+                    >
+                      X
+                    </button>
 
                 </div>
               </li>
